@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+
+
+<script type="module">
+
+  import OnEventMixin from "./src/oneventmixin.js";
+
+  class MyFoo extends HTMLElement {
+    // Should be patched by the mixin in a non-destructive way
+    static get observedAttributes() { return ["data-test"]; }
+    // Should be patched by the mixin in a non-destructive way. Must not be
+    // triggered for changes to onfoo, which, as far as the original class is
+    // concerned, does not exist as an observed attribute.
+    attributeChangedCallback(name) { console.log(name, "changed"); }
+    // This just provides a way to trigger a custom event
+    connectedCallback() {
+      this.addEventListener("click", () => {
+        this.dispatchEvent(new Event("foo"));
+      });
+    }
+  }
+
+  window.customElements.define("my-foo", OnEventMixin(MyFoo, ["foo"]));
+
+</script>
+
+<my-foo onfoo="window.alert('It works')">Click me to trigger foo event</my-foo>
+
+
+</body>
+</html>
+
+
+
