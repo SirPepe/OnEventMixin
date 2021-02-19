@@ -9,24 +9,34 @@ function click(target) {
   target.dispatchEvent(event);
 }
 
-describe("basic events", () => {
-  beforeAll(() =>
-    customElements.define(
-      "basic-events",
-      onEventMixin(
-        class extends HTMLElement {
-          constructor() {
-            super();
-            this.addEventListener("click", () => {
-              this.dispatchEvent(new Event("foo"));
-            });
-          }
-        },
-        ["foo"]
-      )
-    )
-  );
+// Triggers "foo" on click
+class BasicEvents extends HTMLElement {
+  constructor() {
+    super();
+    this.addEventListener("click", () => {
+      this.dispatchEvent(new Event("foo"));
+    });
+  }
+}
 
+customElements.define("basic-events", onEventMixin(BasicEvents, ["foo"]));
+
+// Triggers "foo" and "bar" on click
+class ExtendedBasicEvents extends BasicEvents {
+  constructor() {
+    super();
+    this.addEventListener("click", () => {
+      this.dispatchEvent(new Event("bar"));
+    });
+  }
+}
+
+customElements.define(
+  "extended-basic-events",
+  onEventMixin(ExtendedBasicEvents, ["bar"])
+);
+
+describe("basic events", () => {
   test("initializes on-event properties", () => {
     const target = document.createElement("basic-events");
     expect(target.onfoo).toBe(null);
@@ -82,6 +92,42 @@ describe("basic events", () => {
     click(target);
     expect(onclick.mock.calls.length).toBe(1);
     expect(window.thisShouldRemainZero).toBe(0);
+  });
+});
+
+describe("extended classes", () => {
+  test("initializes on-event properties from the extended and the extending class", () => {
+    const target = document.createElement("extended-basic-events");
+    expect(target.onfoo).toBe(null);
+    expect(target.onbar).toBe(null);
+  });
+
+  test("triggers dom property event handlers for both events", () => {
+    const onclick = jest.fn();
+    const onfoo = jest.fn().mockName("onfoo");
+    const onbar = jest.fn().mockName("onbar");
+    const target = document.createElement("extended-basic-events");
+    target.onclick = onclick;
+    target.onfoo = onfoo;
+    target.onbar = onbar;
+    click(target);
+    expect(onclick.mock.calls.length).toBe(1);
+    expect(onfoo.mock.calls.length).toBe(1);
+    expect(onbar.mock.calls.length).toBe(1);
+  });
+
+  test("triggers html attribute event handlers for both", () => {
+    window.extendedFooAttributeCount = 0;
+    window.extendedBarAttributeCount = 0;
+    const onclick = jest.fn();
+    const target = document.createElement("extended-basic-events");
+    target.setAttribute("onfoo", "window.extendedFooAttributeCount++");
+    target.setAttribute("onbar", "window.extendedBarAttributeCount++");
+    target.onclick = onclick;
+    click(target);
+    expect(onclick.mock.calls.length).toBe(1);
+    expect(window.extendedFooAttributeCount).toBe(1);
+    expect(window.extendedBarAttributeCount).toBe(1);
   });
 });
 

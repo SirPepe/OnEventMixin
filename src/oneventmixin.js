@@ -104,10 +104,12 @@ export default function OnEventMixin(targetConstructor, events) {
       enumerable: false,
       configurable: false,
       get() {
-        return getOrInitEventManagerLazily(this, event).getValue();
+        const manager = getOrInitEventManagerLazily(this, event, attributeName);
+        return manager.getValue();
       },
       set(value) {
-        getOrInitEventManagerLazily(this, event).setProperty(value);
+        const manager = getOrInitEventManagerLazily(this, event, attributeName);
+        manager.setProperty(value);
       },
     });
   }
@@ -144,7 +146,8 @@ export default function OnEventMixin(targetConstructor, events) {
         if (eventAttributeMap.has(name)) {
           getOrInitEventManagerLazily(
             this,
-            eventAttributeMap.get(name)
+            eventAttributeMap.get(name),
+            name
           ).setAttribute(newValue);
         }
         if (
