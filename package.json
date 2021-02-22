@@ -7,7 +7,9 @@
     "build": "rollup -c",
     "test": "jest",
     "test-dev": "jest --watch",
-    "lint": "eslint oneventmixin.js"
+    "test-bundles": "jest --config ./jest/dist.min.config.js && jest --config ./jest/dist.esm.config.js",
+    "lint": "eslint oneventmixin.js",
+    "prepublishOnly": "rm -rf node_modules && npm install && npm run build && npm run test && npm run test-bundles"
   },
   "author": "peter@peterkroener.de",
   "license": "GPL-3.0-only",

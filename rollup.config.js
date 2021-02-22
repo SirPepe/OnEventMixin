@@ -52,7 +52,7 @@ export default [
     input: "src/oneventmixin.js",
     output: {
       file: "dist/min/oneventmixin.min.js",
-      format: "iife",
+      format: "umd",
       name: "OnEventMixin",
       plugins: [terser(), license({ banner })],
     },

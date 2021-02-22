@@ -1,4 +1,10 @@
-import onEventMixin from "../src/oneventmixin";
+// Note that this path may be mapped to any of the dist builds by jest
+let onEventMixin = require("../src/oneventmixin");
+
+// Unwrap ESM module (if testing either from ESM source or the ESM build)
+if (typeof onEventMixin === "object") {
+  onEventMixin = onEventMixin.default;
+}
 
 function click(target) {
   const event = new MouseEvent("click", {
