@@ -34,7 +34,7 @@ class EventManager {
   }
 
   setAttribute(value) {
-    if (value) {
+    if (typeof value === "string") {
       const handlerValue = new Function(value);
       Object.defineProperty(handlerValue, "name", {
         value: `on${this._eventName}`,

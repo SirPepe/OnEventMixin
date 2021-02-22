@@ -48,6 +48,15 @@ describe("basic events", () => {
     expect(typeof target.onfoo).toBe("function");
   });
 
+  test("initializes on-event properties from attributes when created from innerHTML", () => {
+    window.fromInnerHTML = 0;
+    const container = document.createElement("div");
+    container.innerHTML = `<basic-events onfoo="window.fromInnerHTML++"></basic-events>`;
+    const target = container.querySelector("basic-events");
+    click(target);
+    expect(window.fromInnerHTML).toBe(1);
+  });
+
   test("triggers dom property event handlers", () => {
     const onclick = jest.fn();
     const onfoo = jest.fn();
@@ -92,6 +101,36 @@ describe("basic events", () => {
     click(target);
     expect(onclick.mock.calls.length).toBe(1);
     expect(window.thisShouldRemainZero).toBe(0);
+  });
+
+  test("disables event handlers by removing the attribute", () => {
+    const onclick = jest.fn();
+    const onfoo = jest.fn();
+    const target = document.createElement("basic-events");
+    target.setAttribute("onfoo", "throw new Error('this should not happen')");
+    target.onclick = onclick;
+    target.onfoo = onfoo;
+    target.removeAttribute("onfoo");
+    click(target);
+    expect(onclick.mock.calls.length).toBe(1);
+    expect(onfoo.mock.calls.length).toBe(0);
+  });
+
+  test("does not disable event handlers by setting the attribute to an empty string", () => {
+    let update = "";
+    const onclick = jest.fn();
+    const onfoo = jest.fn();
+    const target = document.createElement("basic-events");
+    target.setAttribute("onfoo", "throw new Error('this should not happen')");
+    target.onclick = onclick;
+    target.onfoo = onfoo;
+    target.setAttribute("onfoo", ""); // does nothing, but should keep the handler alive
+    target.addEventListener("foo", () => (update += "L"));
+    target.onfoo = () => (update += "H");
+    click(target);
+    expect(onclick.mock.calls.length).toBe(1);
+    expect(onfoo.mock.calls.length).toBe(0); // replaced by empty attribute
+    expect(update).toBe("HL"); // a handler was registered first
   });
 });
 
