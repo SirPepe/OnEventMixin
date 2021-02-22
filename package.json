@@ -5,6 +5,7 @@
   "main": "dist/esm/oneventmixin.js",
   "module": "dist/esm/oneventmixin.js",
   "browser": "dist/min/oneventmixin.min.js",
+  "types": "oneventmixin.d.ts",
   "scripts": {
     "build": "rollup -c",
     "test": "jest",
