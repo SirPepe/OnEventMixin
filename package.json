@@ -2,7 +2,9 @@
   "name": "oneventmixin",
   "version": "0.0.1",
   "description": "Add inline event attributes to your custom elements with one simple mixin",
-  "main": "oneventmixin.js",
+  "main": "dist/esm/oneventmixin.js",
+  "module": "dist/esm/oneventmixin.js",
+  "browser": "dist/min/oneventmixin.min.js",
   "scripts": {
     "build": "rollup -c",
     "test": "jest",
