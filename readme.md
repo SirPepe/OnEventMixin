@@ -178,7 +178,7 @@ vanilla `div` elements to be able to take the place of `receives-foo`.
 
 ## License
 
-`OnEventMixin` is dual-licensed:
+OnEventMixin is dual-licensed:
 
-* For open-source and personal projects [GPLv3 license](https://opensource.org/licenses/gpl-3.0.html) applies. Download the software and do with it what you want, as long as derivative work is licensed under an equivalent license.
-* If you want to use OnEventMixin for something else [just talk to me](https://www.peterkroener.de/kontakt/) and we can figure something out. I'll probably grant you a free license if your project is small.
+* For open-source and personal projects the [GPLv3 license](https://opensource.org/licenses/gpl-3.0.html) applies. You can download OnEventMixin and do with it what you want, as long as derivative work is licensed under an equivalent license.
+* If you want to use OnEventMixin for something else [just talk to me](https://www.peterkroener.de/kontakt/) and we can figure something out. I'll probably grant you a free license with no strings attached if you ask nicely.
