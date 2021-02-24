@@ -146,9 +146,10 @@ what you ordered.
 ## Limitations
 
 Built-in event handlers for `onclick` and the like are implemented
-[on HTMLElement](https://html.spec.whatwg.org/#htmlelement). This means that
-every element can listen to every event, even if the element itself can't
-possibly trigger the event in question, which has some use for bubbling events:
+[on HTMLElement](https://html.spec.whatwg.org/#htmlelement). Therefore, every
+element can listen to every event, even if the element itself can't
+possibly trigger the event in question. This is somewhat useful for dealing with
+bubbling events:
 
 ```html
 <div onchange="window.alert('Child changed!')">
@@ -159,6 +160,8 @@ possibly trigger the event in question, which has some use for bubbling events:
 There is no way to replicate this exact behavior (event handlers for all custom
 events on *all HTML elements*) with JavaScript due to the lack of synchronous
 attribute monitoring outside of a custom element's `attributeChangedCallback()`.
+This mixin only enables event handlers for the element classes the mixin was
+applied to.
 
 You can still nest _custom elements_ and use their custom inline event handlers
 for this purpose:
