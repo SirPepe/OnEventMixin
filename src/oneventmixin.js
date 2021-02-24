@@ -13,7 +13,7 @@ class EventManager {
 
   _handler = (event) => {
     if (this._handlerValue) {
-      this._handlerValue(event);
+      this._handlerValue.call(this._eventTarget, event);
     }
   };
 
@@ -35,7 +35,7 @@ class EventManager {
 
   setAttribute(value) {
     if (typeof value === "string") {
-      const handlerValue = new Function(value);
+      const handlerValue = new Function("event", value);
       Object.defineProperty(handlerValue, "name", {
         value: `on${this._eventName}`,
       });

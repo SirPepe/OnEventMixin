@@ -72,17 +72,24 @@ describe("basic events", () => {
     click(target);
     expect(onclick.mock.calls.length).toBe(1);
     expect(onfoo.mock.calls.length).toBe(1);
+    expect(onfoo.mock.calls[0][0].type).toBe("foo");
+    expect(onclick.mock.instances).toEqual(onfoo.mock.instances);
   });
 
   test("triggers html attribute event handlers", () => {
-    window.fooAttributeCount = 0;
+    window.fooAttributeThis = null;
+    window.fooAttributeTypes = [];
     const onclick = jest.fn();
     const target = document.createElement("basic-events");
-    target.setAttribute("onfoo", "window.fooAttributeCount++");
+    target.setAttribute(
+      "onfoo",
+      "window.fooAttributeTypes.push(event.type); window.fooAttributeThis = this"
+    );
     target.onclick = onclick;
     click(target);
     expect(onclick.mock.calls.length).toBe(1);
-    expect(window.fooAttributeCount).toBe(1);
+    expect(window.fooAttributeTypes).toEqual(["foo"]);
+    expect(onclick.mock.instances).toEqual([window.fooAttributeThis]);
   });
 
   test("disables dom property event handlers by setting them to null", () => {
