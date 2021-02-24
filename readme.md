@@ -1,9 +1,10 @@
 # OnEventMixin
 
 Add **old-school inline event handler attributes and properties** to your custom
-elements with one simple mixin! By default, inline event attributes only work
-with built-in events (such as `onclick` for `click` events and `onfocus` for
-`focus` events), but that's very easy to change with OnEventMixin:
+elements with one simple mixin! By default, inline event handler attributes only
+work with [built-in events](https://html.spec.whatwg.org/#globaleventhandlers)
+(such as `onclick` for `click` events and `onchange` for `change` events), but
+that's very easy to change with OnEventMixin:
 
 ```html
 <script type="module">
@@ -29,14 +30,15 @@ with built-in events (such as `onclick` for `click` events and `onfocus` for
 
 Open `demo.html` in a new-ish browser to see this in action. The dist folder
 provides pre-build bundles of the mixin function for all browsers newer than
-IE11 in both ESM and minified IIFE flavour.
+IE11 in both ESM and minified UMD flavour.
 
 Notable features:
 
 * Adds inline event handler support for any custom event that you need,
   implementing the same behavior as seen in build-in events and elements
 * Patches the component class in non-destructive way
-* Supports extended component classes just fine
+* Supports extended component classes
+* Supports bubbling events for nested custom elements (see [limitations](#limitations))
 * Easy to use, hard to misuse
 
 The last point obviously depends on whether you think that old-school inline
@@ -140,6 +142,36 @@ handler logic. From your perspective, the `attributeChangedCallback()` behaves
 just like before, the Symbol for the event manager object is effectively
 invisible and the additional on-event properties on class instances are just
 what you ordered.
+
+## Limitations
+
+Built-in event handlers for `onclick` and the like are implemented
+[on HTMLElement](https://html.spec.whatwg.org/#htmlelement). This means that
+every element can listen to every event, even if the element itself can't
+possibly trigger the event in question, which has some use for bubbling events:
+
+```html
+<div onchange="window.alert('Child changed!')">
+  <input type="text" value="Change me!">
+</div>
+```
+
+There is no way to replicate this exact behavior (event handlers for all custom
+events on *all HTML elements*) with JavaScript due to the lack of synchronous
+attribute monitoring outside of a custom element's `attributeChangedCallback()`.
+
+You can still nest _custom elements_ and use their custom inline event handlers
+for this purpose:
+
+```html
+<receives-foo onfoo="window.alert('Foo happened on child!')">
+  <triggers-foo></triggers-foo>
+</receives-foo>
+```
+
+If the mixin for a foo `event` was applied to both `receives-foo` and
+`triggers-foo`, everything will work just fine, just don't expect
+vanilla `div` elements to be able to take the place of `receives-foo`.
 
 ## License
 
