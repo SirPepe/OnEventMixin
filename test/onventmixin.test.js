@@ -20,7 +20,7 @@ class BasicEvents extends HTMLElement {
   constructor() {
     super();
     this.addEventListener("click", () => {
-      this.dispatchEvent(new Event("foo"));
+      this.dispatchEvent(new Event("foo", { bubbles: true }));
     });
   }
 }
@@ -180,6 +180,22 @@ describe("extended classes", () => {
     expect(onclick.mock.calls.length).toBe(1);
     expect(window.extendedFooAttributeCount).toBe(1);
     expect(window.extendedBarAttributeCount).toBe(1);
+  });
+});
+
+describe("bubbling events", () => {
+  test("receives bubbling events", () => {
+    customElements.define(
+      "foo-receiver",
+      onEventMixin(class extends HTMLElement {}, ["foo"])
+    );
+    const onfoo = jest.fn().mockName("onfoo");
+    const fooSender = document.createElement("basic-events");
+    const fooReceiver = document.createElement("foo-receiver");
+    fooReceiver.appendChild(fooSender);
+    fooReceiver.onfoo = onfoo;
+    click(fooSender);
+    expect(onfoo.mock.calls.length).toBe(1);
   });
 });
 
