@@ -10,7 +10,8 @@ const babelConfig = JSON.parse(
 );
 
 const banner = {
-  content: "OnEventMixin | Copyright (C) 2021 Peter Kröner | GPL-3.0-only",
+  content:
+    "OnEventMixin | Copyright (C) 2021 Peter Kröner | peter@peterkroener.de | Dual license GPL-3.0-only/commercial",
   commentStyle: "ignored",
 };
 

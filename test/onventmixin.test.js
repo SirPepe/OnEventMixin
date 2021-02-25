@@ -199,7 +199,7 @@ describe("bubbling events", () => {
   });
 });
 
-describe("you're holding it wrong", () => {
+describe("error handling", () => {
   test("does not do anything unexpected when applying the mixin twice", () => {
     customElements.define(
       "mixin-twice",
@@ -248,10 +248,5 @@ describe("you're holding it wrong", () => {
     expect(() =>
       onEventMixin(class TestElement extends HTMLElement {}, 42)
     ).toThrow(TypeError);
-  });
-
-  test("does not do anything with an empty event name list", () => {
-    const Ctor = class extends HTMLElement {};
-    expect(onEventMixin(Ctor, [])).toBe(Ctor);
   });
 });

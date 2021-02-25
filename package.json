@@ -1,6 +1,13 @@
 {
-  "name": "oneventmixin",
-  "version": "0.0.1",
+  "name": "@sirpepe/oneventmixin",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SirPepe/OnEventMixin.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Add inline event attributes to your custom elements with one simple mixin",
   "main": "dist/esm/oneventmixin.js",
   "module": "dist/esm/oneventmixin.js",
@@ -11,8 +18,9 @@
     "test": "jest",
     "test-dev": "jest --watch",
     "test-bundles": "jest --config ./jest/dist.min.config.js && jest --config ./jest/dist.esm.config.js",
-    "lint": "eslint oneventmixin.js",
-    "prepublishOnly": "rm -rf node_modules && npm install && npm run build && npm run test && npm run test-bundles"
+    "lint": "eslint src/oneventmixin.js",
+    "prepareRelease": "rm -rf node_modules && npm install && npm run build && npm run test && npm run test-bundles",
+    "release": "npm run prepareRelease && release-it"
   },
   "author": "peter@peterkroener.de",
   "license": "GPL-3.0-only",
@@ -31,6 +39,7 @@
     "eslint-plugin-prettier": "^3.3.1",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
+    "release-it": "^14.4.1",
     "rollup": "^2.39.0",
     "rollup-plugin-license": "^2.2.0",
     "rollup-plugin-terser": "^7.0.2"
