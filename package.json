@@ -1,14 +1,19 @@
 {
   "name": "@sirpepe/oneventmixin",
-  "keywords": ["web components", "custom elements", "events", "event handlers"],
+  "keywords": [
+    "web components",
+    "custom elements",
+    "events",
+    "event handlers"
+  ],
   "version": "0.0.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/SirPepe/OnEventMixin.git"
   },
   "bugs": {
-    "url" : "https://github.com/SirPepe/OnEventMixin/issues",
-    "email" : "peter@peterkroener.de"
+    "url": "https://github.com/SirPepe/OnEventMixin/issues",
+    "email": "peter@peterkroener.de"
   },
   "publishConfig": {
     "access": "public"
@@ -28,7 +33,7 @@
     "release": "npm run prepareRelease && release-it"
   },
   "author": "peter@peterkroener.de",
-  "license": "GPL-3.0-only",
+  "license": "SEE LICENSE IN LICENSE.md",
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
