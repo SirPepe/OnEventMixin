@@ -2,11 +2,10 @@
  * OnEventMixin | Copyright (C) 2021 Peter Kröner | peter@peterkroener.de | Dual license GPL-3.0-only/commercial
  */
 
-import 'core-js/modules/web.dom-collections.iterator.js';
 import _defineProperty from '@babel/runtime/helpers/defineProperty';
 
 function getSymbol(name) {
-  return Symbol.for("oneventmixin-".concat(name));
+  return Symbol.for(`oneventmixin-${name}`);
 } // Manages a single on-event property for a HTML element (not EventTargets in
 // general). Note that this is NOT a verbatim implementation of event handling
 // as defined in the specs, but should be close enough for most use cases. See
@@ -29,7 +28,7 @@ class EventManager {
 
     this._eventTarget = target;
     this._eventName = _event;
-    this.setAttribute(this._eventTarget.getAttribute("on".concat(this._eventName)));
+    this.setAttribute(this._eventTarget.getAttribute(`on${this._eventName}`));
   }
 
   setProperty(value) {
@@ -48,7 +47,7 @@ class EventManager {
     if (typeof value === "string") {
       const handlerValue = new Function("event", value);
       Object.defineProperty(handlerValue, "name", {
-        value: "on".concat(this._eventName)
+        value: `on${this._eventName}`
       });
       this._handlerValue = handlerValue;
 
@@ -91,7 +90,7 @@ function OnEventMixin(targetConstructor, events) {
 
   const eventAttributeMap = new Map(Array.from(events).map(event => {
     event = String(event).toLowerCase();
-    return ["on".concat(event), event];
+    return [`on${event}`, event];
   })); // Don't mess up targetConstructor if there's no events
 
   if (eventAttributeMap.size === 0) {
@@ -157,8 +156,33 @@ function OnEventMixin(targetConstructor, events) {
         oldAttributeChangedCallback.call(this, name, oldValue, newValue);
       }
     }
+  }); // This constructor proxy removes all own on-event properties from instances
+  // and re-attaches them before returning the instance. This ensures that
+  // deferred upgrades of custom elements subject existing on-event properties
+  // to the same logic as already-upgraded custom elements do. Without this,
+  // any on-event properties that were attached before the upgrade would
+  // technically still exist after the upgrade, but they would not fire in the
+  // expected manner.
+
+  const ctorProxy = new Proxy(targetConstructor, {
+    construct(target, args, newTarget) {
+      const instance = Reflect.construct(target, args, newTarget);
+
+      for (const [, event] of eventAttributeMap) {
+        const property = `on${event}`;
+
+        if (Object.prototype.hasOwnProperty.call(instance, property)) {
+          const value = instance[property];
+          delete instance[property];
+          instance[property] = value;
+        }
+      }
+
+      return instance;
+    }
+
   });
-  return targetConstructor;
+  return ctorProxy;
 }
 
 export default OnEventMixin;

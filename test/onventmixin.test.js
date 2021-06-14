@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 // Note that this path may be mapped to any of the dist builds by jest
 let onEventMixin = require("../src/oneventmixin");
 
