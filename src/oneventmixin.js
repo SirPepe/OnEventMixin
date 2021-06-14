@@ -172,14 +172,14 @@ export default function OnEventMixin(targetConstructor, events) {
       const instance = Reflect.construct(target, args, newTarget);
       for (const [, event] of eventAttributeMap) {
         const property = `on${event}`;
-        if (instance.hasOwnProperty(property)) {
+        if (Object.prototype.hasOwnProperty.call(instance, property)) {
           const value = instance[property];
           delete instance[property];
           instance[property] = value;
         }
       }
       return instance;
-    }
+    },
   });
 
   return ctorProxy;
