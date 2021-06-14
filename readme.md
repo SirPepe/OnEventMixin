@@ -1,10 +1,16 @@
 # OnEventMixin
 
-Add **old-school inline event handler attributes and properties** to your custom elements with one simple mixin! By default, inline event handler attributes only work with [built-in events](https://html.spec.whatwg.org/#globaleventhandlers) (such as `onclick` for `click` events and `onchange` for `change` events), but that's very easy to change with OnEventMixin:
+Add **old-school inline event handler attributes and properties** to your custom elements with one simple mixin! By default, inline event handler attributes only work with [built-in events](https://html.spec.whatwg.org/#globaleventhandlers) (such as `onclick` for `click` events and `onchange` for `change` events), but that's very easy to change with OnEventMixin! Just install [the package](https://www.npmjs.com/package/@sirpepe/oneventmixin)...
+
+```
+$ npm install @sirpepe/oneventmixin
+```
+
+... and then apply the mixin to your custom element class:
 
 ```html
 <script type="module">
-  import OnEventMixin from "./oneventmixin.js";
+  import OnEventMixin from "@sirpepe/oneventmixin";
 
   class MyFoo extends HTMLElement {
     // This just provides a way to trigger a custom event
@@ -56,7 +62,7 @@ class MyWebComponent extends HTMLElement {
 
 // Patch all logic required for "onfoo" and "onbar" event properties and
 // attributes into the component class. This modifies the class itself!
-import OnEventMixin from "./oneventmixin.js";
+import OnEventMixin from "@sirpepe/oneventmixin";
 OnEventMixin(MyWebComponent, ["foo"]);
 
 // Register the custom element as usual
@@ -78,7 +84,7 @@ The mixin creates all necessary DOM properties and attribute monitoring required
 The mixin works with extended component classes just fine:
 
 ```javascript
-import OnEventMixin from "./oneventmixin.js";
+import OnEventMixin from "@sirpepe/oneventmixin";
 
 class MyWebComponent extends HTMLElement {
   // some logic that can fire "foo" events
@@ -165,7 +171,7 @@ window.customElements.define("with-events", WithEvents);
 let B: WithEvents = document.createElement("without-events"); // Error: WithEvents is a value, not a type
 ```
 
-This makes a non-trivial amount of sense: classes are the only language construct in TypeScript that creates a runtime object (the constructor) and a type that does *not* describe the same object (it rather describes the object the constructor constructs). And there is no way to replicate this behavior in any way but a full-featured class. But one workaround *can* restore the modified constructor's "class-ness":
+This makes a non-trivial amount of sense: classes are the only language construct in TypeScript that create a runtime object (the constructor) and a type that does *not* describe the same object (it rather describes the object the constructor constructs). And there is no way to replicate this behavior in any way but a full-featured class. But one workaround *can* restore the modified constructor's "class-ness":
 
 ```typescript
 class WithoutEvents extends HTMLElement {}
