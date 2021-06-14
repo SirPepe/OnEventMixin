@@ -27,6 +27,12 @@ class BasicEvents extends HTMLElement {
 
 customElements.define("basic-events", onEventMixin(BasicEvents, ["foo"]));
 
+// Perform deferred upgrade to something that triggers "foo" on click
+function defineNow(tagName, ctor) {
+  customElements.define(tagName, onEventMixin(ctor, ["foo"]));
+  return customElements.whenDefined(tagName);
+}
+
 // Triggers "foo" and "bar" on click
 class ExtendedBasicEvents extends BasicEvents {
   constructor() {
@@ -196,6 +202,43 @@ describe("bubbling events", () => {
     fooReceiver.onfoo = onfoo;
     click(fooSender);
     expect(onfoo.mock.calls.length).toBe(1);
+  });
+});
+
+describe("deferred upgrade", () => {
+  test("don't clobber existing dom properties", async () => {
+    const target = document.createElement("deferred-upgrade-a");
+    const onfoo = jest.fn();
+    target.onfoo = onfoo;
+    await defineNow("deferred-upgrade-a", class extends HTMLElement {
+      constructor() {
+        super();
+        this.addEventListener("click", () => {
+          this.dispatchEvent(new Event("foo", { bubbles: true }));
+        });
+      }
+    });
+    customElements.upgrade(target);
+    click(target);
+    expect(onfoo.mock.calls.length).toBe(1);
+  });
+
+  test("works with existing attributes", async () => {
+    window.fromExistingAttributeDeferred = 0;
+    const container = document.createElement("div");
+    container.innerHTML = `<deferred-upgrade-b onfoo="window.fromExistingAttributeDeferred++"></deferred-upgrade-b>`;
+    await defineNow("deferred-upgrade-b", class extends HTMLElement {
+      constructor() {
+        super();
+        this.addEventListener("click", () => {
+          this.dispatchEvent(new Event("foo", { bubbles: true }));
+        });
+      }
+    });
+    const target = container.querySelector("deferred-upgrade-b");
+    customElements.upgrade(target);
+    click(target);
+    expect(window.fromExistingAttributeDeferred).toBe(1);
   });
 });
 

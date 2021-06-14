@@ -29,9 +29,10 @@ Open `demo.html` in a new-ish browser to see this in action. The dist folder pro
 Notable features:
 
 * Adds inline event handler support for any custom event that you need, implementing the same behavior as seen in build-in events and elements
-* Patches the component class in non-destructive way
+* Patches the component class in a non-destructive way
+* Works when element's upgrades are deferred
 * Supports extended component classes
-* Supports bubbling events for nested custom elements (see [limitations](#limitations))
+* Supports bubbling events (for nested _custom_ elements with _custom events_ only, see [limitations](#limitations))
 * Easy to use, hard to misuse
 
 The last point obviously depends on whether you think that old-school inline event handler attributes and properties should even exist on web components.
@@ -98,7 +99,9 @@ It is not necessary to re-apply the mixin logic for events that were already tak
 
 ### How it works
 
-The mixin patches getters and setters for on-event properties into the target class - one pair of getters and setters per event. Their value is managed by objects that implement the aforementioned non-trivial behavior of on-event properties and attributes. These objects live on a secret property (implemented via a symbol) on the target elements and are lazily initiated once the relevant getter or setter is used for the first time. To support on-event content attributes, the mixin also patches the target's `observedAttributes` and `attributeChangedCallback()` callback by extending the list of observedAttributes and delegating calls to `attributeChangedCallback()` that were *not* targeted by the original `observedAttributes` to just the event handler logic. From your perspective, the `attributeChangedCallback()` behaves just like before, the Symbol for the event manager object is effectively invisible and the additional on-event properties on class instances are just what you ordered.
+The mixin patches getters and setters for on-event properties into the target class - one pair of getters and setters per event. Their value is managed by objects that implement the aforementioned non-trivial behavior of on-event properties and attributes. These objects live on a secret property (implemented via a symbol) on the target elements and are lazily initiated once the relevant getter or setter is used for the first time. A constructor proxy ensures that on-event properties that were set before the custom element upgrade (and that therefore a the element's own properties) get initialized properly.
+
+To support on-event content attributes, the mixin also patches the target's `observedAttributes` and `attributeChangedCallback()` callback by extending the list of observedAttributes and delegating calls to `attributeChangedCallback()` that were *not* targeted by the original `observedAttributes` to just the event handler logic. From your perspective, the `attributeChangedCallback()` behaves just like before, the Symbol for the event manager object is effectively invisible and the additional on-event properties on class instances are just what you ordered.
 
 ## Limitations
 
@@ -140,7 +143,7 @@ document.createElement("without-events").onfoo; // error (in TS, not in actualit
 document.createElement("with-events"); // works
 ```
 
-This should not be a problem in most cases, as you are probably not going to be using `<without-events>` all that often - apart from feeding it into `OnEventMixin` of course. But there is another slight caveat: `OnEventMixin` returns a modified *constructor*, which is subtly different from a class. Consider the following class example:
+This should not be a problem in most cases, as you are probably not going to be using the class `WithoutEvents` all that often - apart from feeding it into `OnEventMixin` of course. But there is another slight caveat: `OnEventMixin` returns a modified *constructor*, which is subtly different from a class. Consider the following class example:
 
 ```typescript
 class A {}
@@ -162,7 +165,7 @@ window.customElements.define("with-events", WithEvents);
 let B: WithEvents = document.createElement("without-events"); // Error: WithEvents is a value, not a type
 ```
 
-This makes a non-trivial amount of sense: classes are the only language construct in TypeScript can creates a runtime object (the constructor) and a type that does *not* describe the same object (it rather describes the object the constructor constructs). And there is no way to replicate this behavior in any way but a full-featured class. But one workaround *can* restore the modified constructor's "class-ness":
+This makes a non-trivial amount of sense: classes are the only language construct in TypeScript that creates a runtime object (the constructor) and a type that does *not* describe the same object (it rather describes the object the constructor constructs). And there is no way to replicate this behavior in any way but a full-featured class. But one workaround *can* restore the modified constructor's "class-ness":
 
 ```typescript
 class WithoutEvents extends HTMLElement {}
@@ -181,6 +184,11 @@ export { MyComponentClassWithEvents as MyComponentClass };
 ```
 
 Just be sure to leave a comment in your code to explain what you are doing.
+
+## Changelog
+
+* **0.0.3**: added support (via Proxy) for keeping on-event properties that were added before the element upgrade
+* **0.0.2**: initial release
 
 ## License
 

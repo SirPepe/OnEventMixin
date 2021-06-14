@@ -160,5 +160,27 @@ export default function OnEventMixin(targetConstructor, events) {
     }
   );
 
-  return targetConstructor;
+  // This constructor proxy removes all own on-event properties from instances
+  // and re-attaches them before returning the instance. This ensures that
+  // deferred upgrades of custom elements subject existing on-event properties
+  // to the same logic as already-upgraded custom elements do. Without this,
+  // any on-event properties that were attached before the upgrade would
+  // technically still exist after the upgrade, but they would not fire in the
+  // expected manner.
+  const ctorProxy = new Proxy(targetConstructor, {
+    construct(target, args, newTarget) {
+      const instance = Reflect.construct(target, args, newTarget);
+      for (const [, event] of eventAttributeMap) {
+        const property = `on${event}`;
+        if (instance.hasOwnProperty(property)) {
+          const value = instance[property];
+          delete instance[property];
+          instance[property] = value;
+        }
+      }
+      return instance;
+    }
+  });
+
+  return ctorProxy;
 }
